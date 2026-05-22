@@ -15,4 +15,5 @@ export const config = {
   NODE_ENV: getEnv("NODE_ENV", "development"),
   isDevelopment: getEnv("NODE_ENV", "development") === "development",
   isProduction: getEnv("NODE_ENV", "development") === "production",
+  DATABASE_URL: getEnv("DATABASE_URL"),
 };
