@@ -1,6 +1,9 @@
-import { randomUUID, scryptSync } from "crypto";
+import { randomUUID, scrypt as scryptCallback } from "crypto";
+import { promisify } from "util";
 import { AppError } from "../types/response.types";
 import { userRepository } from "../repositories/user.repository";
+
+const scrypt = promisify(scryptCallback);
 
 type RegisterUserParams = {
   email: string;
@@ -15,10 +18,10 @@ export type UserPublic = {
   created_at: string;
 };
 
-const hashPassword = (password: string): string => {
+const hashPassword = async (password: string): Promise<string> => {
   const salt = randomUUID();
-  const hash = scryptSync(password, salt, 64).toString("hex");
-  return `${salt}:${hash}`;
+  const derived = (await scrypt(password, salt, 64)) as Buffer;
+  return `${salt}:${derived.toString("hex")}`;
 };
 
 export const userService = {
@@ -27,10 +30,12 @@ export const userService = {
 
     const existing = await userRepository.findByEmail(normalizedEmail);
     if (existing) {
-      throw new AppError("Email already in use", "EMAIL_ALREADY_EXISTS", 409);
+      throw AppError.conflict("Email is already registered", {
+        field: "email",
+      });
     }
 
-    const password_hash = hashPassword(params.password);
+    const password_hash = await hashPassword(params.password);
 
     const created = await userRepository.create({
       email: normalizedEmail,

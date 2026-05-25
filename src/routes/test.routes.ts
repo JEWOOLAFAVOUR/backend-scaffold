@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { AppError } from "../types/response.types";
+import { AppError, ERROR_CODES } from "../types/response.types";
+import { file } from "zod";
 
 const router = Router();
 
 router.get("/test-error", (req, res) => {
-  throw new AppError("This is a test error", "TEST_ERROR", 400);
+  throw AppError.validation("This is a test error", {
+    test: "additional details",
+  });
 });
 
 export default router;

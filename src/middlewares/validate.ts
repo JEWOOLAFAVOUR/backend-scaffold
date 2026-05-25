@@ -5,14 +5,18 @@ import { AppError } from "../types/response.types";
 export const validate =
   (schema: ZodObject<any>) =>
   (req: Request, res: Response, next: NextFunction): void => {
-    try {
-      req.body = schema.parse(req.body) as any;
-      next();
-    } catch (err) {
-      if (err instanceof ZodError) {
-        const message = err.issues.map((i) => i.message).join("; ");
-        throw new AppError(message, "VALIDATION_ERROR", 400);
-      }
-      next(err);
+    const parsed = schema.safeParse(req.body);
+
+    if (!parsed.success) {
+      const details = parsed.error.issues.map((issue) => ({
+        path: issue.path.join("."),
+        message: issue.message,
+      }));
+
+      next(AppError.validation("Request body validation failed", details));
+      return;
     }
+
+    req.body = parsed.data;
+    next();
   };

@@ -3,8 +3,18 @@ import { pool } from "../database/connection";
 export type UserRecord = {
   id: string;
   email: string;
-  name: string;
+  firstname: string;
+  lastname: string;
+  phone_number: string;
+  avatar_url: string;
+  cover_url: string;
+  date_of_birth: Date;
+  email_verified: boolean;
+  phone_verified: boolean;
+  email_verified_at: Date;
   password_hash: string;
+  two_factor_enabled: boolean;
+  last_login_at: Date;
   created_at: string;
   updated_at: string;
 };
@@ -12,7 +22,7 @@ export type UserRecord = {
 export const userRepository = {
   async findByEmail(email: string): Promise<UserRecord | null> {
     const res = await pool.query(
-      `SELECT id, email, name, password_hash, created_at, updated_ at
+      `SELECT id, email, name, password_hash, created_at, updated_at
         FROM users 
         WHERE email = $1 
         LIMIT 1`,

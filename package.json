@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node-dev src/server.ts",
     "migrate": "node-pg-migrate",
-    "migrate:up": "node-pg-migrate up",
-    "migrate:down": "node-pg-migrate down"
+    "migrate:up": "node-pg-migrate up -m src/database/migrations",
+    "migrate:down": "node-pg-migrate down -m src/database/migrations"
   },
   "keywords": [],
   "author": "Jewoola Favour",
