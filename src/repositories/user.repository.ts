@@ -22,7 +22,7 @@ export type UserRecord = {
 export const userRepository = {
   async findByEmail(email: string): Promise<UserRecord | null> {
     const res = await pool.query(
-      `SELECT id, email, name, password_hash, created_at, updated_at
+      `SELECT id, email, first_name, last_name, password_hash, created_at, updated_at
         FROM users 
         WHERE email = $1 
         LIMIT 1`,
@@ -33,14 +33,15 @@ export const userRepository = {
 
   async create(params: {
     email: string;
-    name: string;
+    first_name: string;
+    last_name: string;
     password_hash: string;
   }): Promise<UserRecord> {
     const res = await pool.query(
-      `INSERT INTO users (email, name, password_hash)
+      `INSERT INTO users (email, first_name, last_name, password_hash)
         VALUES ($1, $2, $3)
-        RETURNING id, email, name, created_at, updated_at`,
-      [params.email, params.name, params.password_hash],
+        RETURNING id, email, first_name, last_name, created_at, updated_at`,
+      [params.email, params.first_name, params.last_name, params.password_hash],
     );
     return res.rows[0];
   },
