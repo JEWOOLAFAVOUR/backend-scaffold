@@ -1,8 +1,19 @@
+import { randomUUID, scrypt as scryptCallback } from "crypto";
+import { promisify } from "util";
+import { AppError } from "../types/response.types";
 import { withTransaction } from "../database/connection";
 import { userRepository } from "../repositories/user.repository";
-import { userSecurityRepository } from "../repositories/userSecurity.repository";
-import { userProfileRepository } from "../repositories/userProfile.repository";
-import { AppError } from "../types/response.types";
+import { userProfileRepository } from "../repositories/userprofile.repository";
+import { userSecurityRepository } from "../repositories/usersecurity.repository";
+import { UserPublicDTO } from "../types/user.types";
+
+const scrypt = promisify(scryptCallback);
+
+const hashPassword = async (password: string): Promise<string> => {
+  const salt = randomUUID();
+  const derived = (await scrypt(password, salt, 64)) as Buffer;
+  return `${salt}:${derived.toString("hex")}`;
+};
 
 export const userService = {
   async register(params: {
@@ -10,43 +21,52 @@ export const userService = {
     first_name: string;
     last_name: string;
     password: string;
-  }) {
+  }): Promise<UserPublicDTO> {
+    const normalizedEmail = params.email.trim().toLowerCase();
+
     return withTransaction(async (client) => {
-      // use repository functions that accept client to run within same tx
-      const normalizedEmail = params.email.trim().toLowerCase();
-      const existing = await userRepository.findByEmailClient(
-        client,
+      const existingUser = await userRepository.findByEmail(
         normalizedEmail,
+        client,
       );
-      if (existing)
+      if (existingUser)
         throw AppError.conflict("Email is already registered", {
           field: "email",
         });
 
-      const createdUser = await userRepository.createClient(client, {
-        email: normalizedEmail,
-        first_name: first_name,
-        last_name: last_name,
-      });
+      const createdUser = await userRepository.createReturningId(
+        { email: normalizedEmail },
+        client,
+      );
 
-      await userSecurityRepository.createClient(client, {
-        user_id: createdUser.id,
-        password_hash: "salted-hash",
-      });
+      const password_hash = await hashPassword(params.password);
 
-      await userProfileRepository.createClient(client, {
-        user_id: createdUser.id,
-        first_name: first_name,
-        last_name: last_name,
-      });
+      await userSecurityRepository.create(
+        {
+          user_id: createdUser.id,
+          password_hash,
+          two_factor_enabled: false,
+        },
+        client,
+      );
+
+      await userProfileRepository.create(
+        {
+          user_id: createdUser.id,
+          first_name: params.first_name,
+          last_name: params.last_name,
+        },
+        client,
+      );
 
       return {
         id: createdUser.id,
-        email: createdUser.email,
-        first_name: createdUser.first_name,
-        last_name: createdUser.last_name,
+        email: normalizedEmail,
+        first_name: params.first_name,
+        last_name: params.last_name,
+        status: "active",
         created_at: createdUser.created_at,
-      };
+      } as UserPublicDTO;
     });
   },
 };

@@ -5,10 +5,10 @@ export type UserCoreRecord = {
   email_verified_at?: string | null;
   phone_number?: string | null;
   phone_verified_at?: string | null;
-  last_login_at: string | null;
+  deleted_at?: string | null;
+  last_login_at?: string | null;
   created_at: string;
   updated_at: string;
-  delete_at?: string | null;
 };
 
 export type UserSecurityRecord = {
@@ -16,7 +16,7 @@ export type UserSecurityRecord = {
   password_hash: string;
   password_changed_at?: string | null;
   two_factor_enabled: boolean;
-  failed_login_count: number;
+  failed_login_count?: number;
   locked_until?: string | null;
   created_at: string;
   updated_at: string;

@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'active',
+  phone_number TEXT UNIQUE,
+  email_verified_at TIMESTAMP WITH TIME ZONE,
+  phone_verified_at TIMESTAMP WITH TIME ZONE,
+  last_login_at TIMESTAMP WITH TIME ZONE,
+  deleted_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
