@@ -36,4 +36,27 @@ export const userProfileRepository = {
       : await pool.query<UserProfileRecord>(q, values);
     return res.rows[0];
   },
+
+  async findByUserId(
+    user_id: string,
+    client?: PoolClient,
+  ): Promise<UserProfileRecord | null> {
+    const q = `SELECT user_id::text AS user_id,
+                first_name,
+                last_name,
+                date_of_birth::text AS date_of_birth,
+                avatar_url,
+                cover_url,
+                created_at, 
+                updated_at
+            FROM user_profiles
+            WHERE user_id = $1
+            LIMIT 1`;
+
+    const res = client
+      ? await client.query<UserProfileRecord>(q, [user_id])
+      : await pool.query<UserProfileRecord>(q, [user_id]);
+
+    return res.rows[0] ?? null;
+  },
 };

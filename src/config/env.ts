@@ -16,4 +16,6 @@ export const config = {
   isDevelopment: getEnv("NODE_ENV", "development") === "development",
   isProduction: getEnv("NODE_ENV", "development") === "production",
   DATABASE_URL: getEnv("DATABASE_URL"),
+  JWT_SECRET: getEnv("JWT_SECRET"),
+  JWT_EXPIRES_IN: getEnv("JWT_EXPIRES_IN", "1h"),
 };

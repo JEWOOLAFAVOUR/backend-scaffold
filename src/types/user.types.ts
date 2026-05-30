@@ -38,7 +38,7 @@ export type UserPublicDTO = {
   email: string;
   first_name?: string | null;
   last_name?: string | null;
-  avatar_url: string | null;
+  avatar_url?: string | null;
   status: UserCoreRecord["status"];
   created_at: string;
 };

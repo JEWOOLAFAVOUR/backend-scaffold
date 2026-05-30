@@ -7,11 +7,11 @@ export const loginUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const user = await authService.login(req.body);
+    const result = await authService.login(req.body);
 
     res.status(200).json({
       success: true,
-      data: user,
+      data: result,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {

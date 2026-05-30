@@ -29,6 +29,18 @@ export const userRepository = {
     return res.rows[0];
   },
 
+  async findById(
+    id: string,
+    client?: PoolClient,
+  ): Promise<UserCoreRecord | null> {
+    const q = `SELECT id::text, email, status, phone_number, email_verified_at, phone_verified_at, last_login_at, deleted_at, created_at, updated_at
+                 FROM users WHERE id = $1 LIMIT 1`;
+    const res = client
+      ? await client.query<UserCoreRecord>(q, [id])
+      : await pool.query<UserCoreRecord>(q, [id]);
+    return res.rows[0] ?? null;
+  },
+
   async createReturningId(
     params: { email: string; status?: string },
     client?: PoolClient,

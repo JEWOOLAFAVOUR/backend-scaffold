@@ -4,13 +4,15 @@ import { withTransaction } from "../database/connection";
 import { userRepository } from "../repositories/user.repository";
 import { userSecurityRepository } from "../repositories/usersecurity.repository";
 import { UserPublicDTO } from "../types/user.types";
-
+import { signAuthToken } from "../config/jwt";
+import { userProfileRepository } from "../repositories/userprofile.repository";
+import { LoginResponse } from "../types/auth.types";
 
 export const authService = {
   async login(params: {
     email: string;
     password: string;
-  }): Promise<UserPublicDTO> {
+  }): Promise<LoginResponse> {
     const normalizedEmail = params.email.trim().toLowerCase();
 
     return withTransaction(async (client) => {
@@ -69,6 +71,8 @@ export const authService = {
         });
       }
 
+      const profile = await userProfileRepository.findByUserId(user.id, client);
+
       await client.query(
         `UPDATE users
         SET last_login_at = now(),
@@ -85,14 +89,24 @@ export const authService = {
         [user.id],
       );
 
-      return {
-        id: user.id,
+      const accessToken = signAuthToken({
+        sub: user.id,
         email: user.email,
-        first_name: undefined,
-        last_name: undefined,
-        avatar_url: null,
         status: user.status,
-        created_at: user.created_at,
+      });
+
+      return {
+        access_token: accessToken,
+        token_type: "Bearer",
+        user: {
+          id: user.id,
+          email: user.email,
+          first_name: profile?.first_name ?? null,
+          last_name: profile?.last_name ?? null,
+          avatar_url: profile?.avatar_url ?? null,
+          status: user.status,
+          created_at: user.created_at,
+        },
       };
     });
   },
