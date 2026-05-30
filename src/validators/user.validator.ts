@@ -12,6 +12,7 @@ export const createUserSchema = z.object({
     .regex(/[a-z]/, "Password must include a lowercase letter")
     .regex(/[0-9]/, "Password must include a number")
     .regex(/[^A-Za-z0-9]/, "Password must include a special character"),
-});
+})
+.strict();
 
 export type CreateUserInput = z.infer<typeof createUserSchema>;

@@ -2,74 +2,11 @@ import argon2 from "argon2";
 import { AppError, ERROR_CODES } from "../types/response.types";
 import { withTransaction } from "../database/connection";
 import { userRepository } from "../repositories/user.repository";
-import { userProfileRepository } from "../repositories/userprofile.repository";
 import { userSecurityRepository } from "../repositories/usersecurity.repository";
 import { UserPublicDTO } from "../types/user.types";
 
-const hashPassword = async (password: string): Promise<string> => {
-  return argon2.hash(password, {
-    type: argon2.argon2id,
-    memoryCost: 2 ** 16,
-    timeCost: 3,
-    parallelism: 1,
-  });
-};
 
-export const userService = {
-  async register(params: {
-    email: string;
-    first_name: string;
-    last_name: string;
-    password: string;
-  }): Promise<UserPublicDTO> {
-    const normalizedEmail = params.email.trim().toLowerCase();
-
-    return withTransaction(async (client) => {
-      const existingUser = await userRepository.findByEmail(
-        normalizedEmail,
-        client,
-      );
-      if (existingUser)
-        throw AppError.conflict("Email is already registered", {
-          field: "email",
-        });
-
-      const createdUser = await userRepository.createReturningId(
-        { email: normalizedEmail },
-        client,
-      );
-
-      const password_hash = await hashPassword(params.password);
-
-      await userSecurityRepository.create(
-        {
-          user_id: createdUser.id,
-          password_hash,
-          two_factor_enabled: false,
-        },
-        client,
-      );
-
-      await userProfileRepository.create(
-        {
-          user_id: createdUser.id,
-          first_name: params.first_name,
-          last_name: params.last_name,
-        },
-        client,
-      );
-
-      return {
-        id: createdUser.id,
-        email: normalizedEmail,
-        first_name: params.first_name,
-        last_name: params.last_name,
-        status: "active",
-        created_at: createdUser.created_at,
-      } as UserPublicDTO;
-    });
-  },
-
+export const authService = {
   async login(params: {
     email: string;
     password: string;

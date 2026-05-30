@@ -28,4 +28,27 @@ export const userSecurityRepository = {
       : await pool.query<UserSecurityRecord>(q, values);
     return res.rows[0];
   },
+
+  async findByUserId(
+    user_id: string,
+    client?: PoolClient,
+  ): Promise<UserSecurityRecord | null> {
+    const q = `SELECT user_id::text AS user_id,
+                    password_hash,
+                    password_changed_at::text AS password_changed_at,
+                    two_factor_enabled,
+                    failed_login_count,
+                    locked_until::text AS locked_until,
+                    created_at,
+                    updated_at
+                FROM user_security
+                WHERE user_id = $1
+                LIMIT 1`;
+
+    const res = client
+      ? await client.query<UserSecurityRecord>(q, [user_id])
+      : await pool.query<UserSecurityRecord>(q, [user_id]);
+
+    return res.rows[0] ?? null;
+  },
 };

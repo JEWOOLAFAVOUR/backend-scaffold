@@ -2,6 +2,7 @@ import express from "express";
 import healthRoutes from "./routes/health.routes";
 import testRoutes from "./routes/test.routes";
 import userRoutes from "./routes/user.routes";
+import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middlewares/errorHandler";
 import { securityMiddleware, jsonBodyParser } from "./config/security";
 
@@ -13,6 +14,7 @@ app.use(express.json(jsonBodyParser));
 app.use("/api/v1", healthRoutes);
 app.use("/api/v1", testRoutes);
 app.use("/api/v1", userRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

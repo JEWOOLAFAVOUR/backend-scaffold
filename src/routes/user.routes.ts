@@ -6,6 +6,11 @@ import { authLimiter } from "../config/rateLimit";
 
 const router = Router();
 
-router.post("/users", authLimiter, validate(createUserSchema), registerUser);
+router.post(
+  "/users",
+  authLimiter,
+  validate(createUserSchema, "Create account body contains unsupported fields"),
+  registerUser,
+);
 
 export default router;
