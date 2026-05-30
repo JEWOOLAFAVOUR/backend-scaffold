@@ -3,10 +3,12 @@ import healthRoutes from "./routes/health.routes";
 import testRoutes from "./routes/test.routes";
 import userRoutes from "./routes/user.routes";
 import { errorHandler } from "./middlewares/errorHandler";
+import { securityMiddleware, jsonBodyParser } from "./config/security";
 
 const app = express();
 
-app.use(express.json());
+app.use(securityMiddleware);
+app.use(express.json(jsonBodyParser));
 
 app.use("/api/v1", healthRoutes);
 app.use("/api/v1", testRoutes);

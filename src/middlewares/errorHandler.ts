@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { AppError, ApiResponse, ERROR_CODES } from "../types/response.types";
 
 type JsonParseError = SyntaxError & {
-  status?: number;
-  statusCode?: number;
   type?: string;
 };
 
