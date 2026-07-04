@@ -1,7 +1,8 @@
 import express from "express";
 import healthRoutes from "./routes/health.routes";
 import testRoutes from "./routes/test.routes";
-import authModule from "./modules/auth";
+import authRoutes from "./modules/auth/auth.routes";
+import auditRoutes from "./modules/audit/audit.routes";
 import {
   errorHandler,
   securityMiddleware,
@@ -15,7 +16,8 @@ app.use(express.json(jsonBodyParser));
 
 app.use("/api/v1", healthRoutes);
 app.use("/api/v1", testRoutes);
-app.use("/api/v1/auth", authModule);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/audit", auditRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listAuditLogs } from "../controllers/audit.controller";
+import { listAuditLogs } from "./audit.controller";
 
 const router = Router();
 

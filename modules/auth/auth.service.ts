@@ -1,10 +1,9 @@
 import argon2 from "argon2";
-import { withTransaction } from "../../../core/database";
-import { AppError, ERROR_CODES } from "../../../core/errors";
-import { signAuthToken } from "../../../core/config";
-import { LoginResponse, RegisterResponse } from "../types/auth.types";
-import { userRepository } from "../repositories/user.repository";
-import { securityRepository } from "../repositories/security.repository";
+import { withTransaction } from "../../core/database";
+import { AppError, ERROR_CODES } from "../../core/errors";
+import { signAuthToken } from "../../core/config";
+import { LoginResponse, RegisterResponse } from "./auth.types";
+import { userRepository } from "./user.repository";
 
 const hashPassword = async (password: string): Promise<string> => {
   return argon2.hash(password, {
@@ -47,7 +46,7 @@ export const authService = {
 
       const password_hash = await hashPassword(params.password);
 
-      await securityRepository.create(
+      await userRepository.createSecurity(
         {
           user_id: createdUser.id,
           password_hash,
@@ -91,7 +90,7 @@ export const authService = {
         });
       }
 
-      const security = await securityRepository.findByUserId(user.id, client);
+      const security = await userRepository.findSecurityByUserId(user.id, client);
 
       if (!security) {
         throw new AppError({

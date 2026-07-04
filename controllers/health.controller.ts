@@ -7,6 +7,6 @@ export const healthCheck = (req: Request, res: Response) => {
       status: "OK",
       message: "Server is healthy",
     },
-    timeStamp: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
   });
 };

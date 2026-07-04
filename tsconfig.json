@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "CommonJS",
-    "rootDir": "./src",
+    "rootDir": ".",
     "outDir": "./dist",
     "moduleResolution": "node",
     "ignoreDeprecations": "6.0",
@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true
   },
-  "include": ["src"],
+  "include": ["app.ts", "server.ts", "controllers", "core", "database", "modules", "routes"],
   "exclude": ["node_modules", "dist"]
 }
 

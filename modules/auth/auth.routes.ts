@@ -1,10 +1,8 @@
 import { Router } from "express";
-import { loginUserSchema } from "../validators/login.validator";
-import { registerUserSchema } from "../validators/register.validator";
-import { registerUser, loginUser } from "../controllers/auth.controller";
-import { authLimiter, loginLimiter } from "../../../core/middleware";
-import { validate } from "../../../core/middleware";
-import { authenticate } from "../../../core/middleware";
+import { loginUserSchema, registerUserSchema } from "./validators";
+import { registerUser, loginUser } from "./auth.controller";
+import { authLimiter, loginLimiter } from "../../core/middleware";
+import { validate, authenticate } from "../../core/middleware";
 
 const router = Router();
 
